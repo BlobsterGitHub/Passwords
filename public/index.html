@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #555;
+        }
+        .input-section {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .results, .common-passwords {
+            margin-top: 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Password Usage Tracker</h1>
+        <div class="input-section">
+            <label for="password">Enter a password:</label>
+            <input type="password" id="password" placeholder="Enter password">
+            <button id="checkPassword">Check</button>
+        </div>
+        <div class="results">
+            <h2>Results</h2>
+            <p>Number of users: <span id="userCount">0</span></p>
+            <p>Times used: <span id="usageCount">0</span></p>
+        </div>
+        <div class="common-passwords">
+            <h2>Common Passwords</h2>
+            <ul id="commonPasswords"></ul>
+        </div>
+    </div>
+    <script>
+        document.getElementById('checkPassword').addEventListener('click', async () => {
+            const password = document.getElementById('password').value;
+
+            if (!password) {
+                alert("Please enter a password.");
+                return;
+            }
+
+            const response = await fetch('/check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password }),
+            });
+
+            const data = await response.json();
+
+            // Update the results section
+            document.getElementById('userCount').textContent = data.userCount || 0;
+            document.getElementById('usageCount').textContent = data.usageCount || 0;
+
+            // Update the common passwords list
+            const list = document.getElementById('commonPasswords');
+            list.innerHTML = '';
+            data.commonPasswords.forEach(pw => {
+                const li = document.createElement('li');
+                li.textContent = pw;
+                list.appendChild(li);
+            });
+        });
+    </script>
+</body>
+</html>
